@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ profile.user.username }}'s Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Welcome, {{ profile.user.username }}!</h1>
+        <div class="mt-4">
+            <h3>Liked Movies</h3>
+            <ul class="list-group">
+                {% for movie in profile.liked_movies.all %}
+                    <li class="list-group-item">{{ movie.movie_name }} ({{ movie.year }})</li>
+                {% empty %}
+                    <li class="list-group-item">No liked movies yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="mt-4">
+            <h3>Disliked Movies</h3>
+            <ul class="list-group">
+                {% for movie in profile.disliked_movies.all %}
+                    <li class="list-group-item">{{ movie.movie_name }} ({{ movie.year }})</li>
+                {% empty %}
+                    <li class="list-group-item">No disliked movies yet.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
