@@ -9,7 +9,9 @@
 <body>
     <div class="container mt-5">
         <h1 class="text-center">Welcome, {{ profile.user.username }}!</h1>
-        <div class="mt-4">
+
+        <!-- Liked Movies Section -->
+        <div class="my-4">
             <h3>Liked Movies</h3>
             <ul class="list-group">
                 {% for movie in profile.liked_movies.all %}
@@ -19,7 +21,9 @@
                 {% endfor %}
             </ul>
         </div>
-        <div class="mt-4">
+
+        <!-- Disliked Movies Section -->
+        <div class="my-4">
             <h3>Disliked Movies</h3>
             <ul class="list-group">
                 {% for movie in profile.disliked_movies.all %}
@@ -29,6 +33,29 @@
                 {% endfor %}
             </ul>
         </div>
+
+        <!-- Watched Movies Section -->
+        <div class="my-4">
+            <h3>Watched Movies</h3>
+            <ul class="list-group">
+                {% for movie_watch in profile.movie_watches.all %}
+                    <li class="list-group-item">
+                        {{ movie_watch.movie.movie_name }} ({{ movie_watch.movie.year }}) 
+                        - {% if movie_watch.is_finished %}
+                            <span class="badge bg-success">Finished</span>
+                          {% else %}
+                            <span class="badge bg-warning">Not Finished</span>
+                          {% endif %}
+                        <br>
+                        <small class="text-muted">Watched on: {{ movie_watch.watched_at|date:"d M Y, H:i" }}</small>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No movies marked as watched.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
     </div>
 </body>
 </html>
+
