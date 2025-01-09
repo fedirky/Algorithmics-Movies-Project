@@ -26,33 +26,33 @@ class MoviePage(DetailView):
         movie_id = self.kwargs.get('movie_id')
         return get_object_or_404(Movie, movie_id=movie_id)
 
-class MovieSearchView(FormView):
-    template_name = 'movies/search_form.html'
-    form_class = MovieSearchForm
 
-    def get(self, request, *args, **kwargs):
+class MovieSearchView(ListView):
+    model = Movie
+    template_name = 'movies/search_movies.html'
+    context_object_name = 'results'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
         form = self.get_form()
-        query_results = None
-
         if form.is_valid():
-            query_results = self.get_queryset(form)
-        
-        return self.render_to_response(self.get_context_data(form=form, results=query_results))
+            name = form.cleaned_data.get('name')
+            year = form.cleaned_data.get('year')
+            genre = form.cleaned_data.get('genre')
 
-    def get_queryset(self, form):
-        # Отримуємо дані з форми
-        movie_name = form.cleaned_data.get('movie_name')
-        year = form.cleaned_data.get('year')
-        genres = form.cleaned_data.get('genres')
+            if name:
+                queryset = queryset.filter(movie_name__icontains=name)
+            if year:
+                queryset = queryset.filter(year=year)
+            if genre:
+                queryset = queryset.filter(genres=genre)
+        return queryset
 
-        # Створюємо базовий запит
-        query_results = Movie.objects.all()
+    def get_form(self):
+        return MovieSearchForm(self.request.GET or None)
 
-        if movie_name:
-            query_results = query_results.filter(movie_name__icontains=movie_name)
-        if year:
-            query_results = query_results.filter(year=year)
-        if genres.exists():
-            query_results = query_results.filter(genres__in=genres).distinct()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = self.get_form()
+        return context
 
-        return query_results

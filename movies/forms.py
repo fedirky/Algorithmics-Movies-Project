@@ -1,17 +1,13 @@
+# forms.py
 from django import forms
-from .models import Movie
+from .models import Movie, MovieGenre
 
-class MovieSearchForm(forms.ModelForm):
-    class Meta:
-        model = Movie
-        fields = ['movie_name', 'year', 'genres']
-        widgets = {
-            'movie_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Movie Name'}),
-            'year': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Year'}),
-            'genres': forms.SelectMultiple(attrs={'class': 'form-select'}),
-        }
+class MovieSearchForm(forms.Form):
+    name = forms.CharField(required=False, label="Movie Name")
+    year = forms.IntegerField(required=False, label="Release Year")
+    genre = forms.ModelChoiceField(
+        queryset=MovieGenre.objects.all(), 
+        required=False, 
+        label="Genre"
+    )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.required = False
