@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Update Watch Details{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="card">
+        <div class="card-header text-center">
+            <h1>{{ movie.movie_name }}</h1>
+            <small class="text-muted">Year: {{ movie.year }}</small>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Update Watch Details</h5>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group my-3">
+                    <label for="watched_at">Date Watched:</label>
+                    <input type="datetime-local" class="form-control" id="watched_at" name="watched_at" 
+                           value="{{ movie_watch.watched_at|date:'Y-m-d\\TH:i' }}">
+                </div>
+                <div class="form-check my-3">
+                    <input type="checkbox" class="form-check-input" id="is_finished" name="is_finished" 
+                           {% if movie_watch.is_finished %}checked{% endif %}>
+                    <label class="form-check-label" for="is_finished">Finished Watching</label>
+                </div>
+                <div class="form-group my-3">
+                    <label for="rating">Rating:</label>
+                    <select class="form-control" id="rating" name="rating">
+                        <option value="1" {% if movie_watch.rating == 1 %}selected{% endif %}>Liked</option>
+                        <option value="0" {% if movie_watch.rating == 0 %}selected{% endif %}>Neutral</option>
+                        <option value="-1" {% if movie_watch.rating == -1 %}selected{% endif %}>Disliked</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-success">Save</button>
+                <a href="{% url 'movie_detail' movie.id %}" class="btn btn-secondary">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

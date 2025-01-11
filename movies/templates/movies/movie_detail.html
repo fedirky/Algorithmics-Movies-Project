@@ -33,6 +33,12 @@
                     {{ star.name }}{% if not forloop.last %}, {% endif %}
                 {% endfor %}
             </p>
+            <hr>
+
+            <!-- Button to add or update MovieWatch -->
+            <a href="{% url 'movie_watch_add_or_update' movie.id %}" class="btn btn-primary">
+                Mark as Watched / Update Watch Details
+            </a>
         </div>
     </div>
 </div>

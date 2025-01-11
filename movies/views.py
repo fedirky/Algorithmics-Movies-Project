@@ -1,10 +1,15 @@
 #from django.shortcuts import render
 
 from django.views.generic.edit import FormView
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.views.generic import ListView, DetailView
 from .models import Movie
 from .forms import MovieSearchForm
+
+from django.views import View
+from django.contrib import messages
+from users.models import MovieWatch, UserProfile
+from django.utils.timezone import now
 
 
 class TopRatedMoviesView(ListView):
@@ -56,3 +61,36 @@ class MovieSearchView(ListView):
         context['form'] = self.get_form()
         return context
 
+
+class MovieWatchUpdateView(View):
+    template_name = 'movies/movie_watch_form.html'
+
+    def get(self, request, movie_id):
+        movie = get_object_or_404(Movie, id=movie_id)
+        profile = get_object_or_404(UserProfile, user=request.user)
+
+        # Отримання або створення MovieWatch
+        movie_watch, created = MovieWatch.objects.get_or_create(
+            movie=movie,
+            user_profile=profile,
+            defaults={'watched_at': now(), 'is_finished': False, 'rating': 0}
+        )
+
+        return render(request, self.template_name, {
+            'movie': movie,
+            'movie_watch': movie_watch,
+        })
+
+    def post(self, request, movie_id):
+        movie = get_object_or_404(Movie, id=movie_id)
+        profile = get_object_or_404(UserProfile, user=request.user)
+        movie_watch = get_object_or_404(MovieWatch, movie=movie, user_profile=profile)
+
+        # Оновлення даних MovieWatch
+        movie_watch.is_finished = 'is_finished' in request.POST
+        movie_watch.rating = int(request.POST.get('rating', 0))
+        movie_watch.watched_at = request.POST.get('watched_at', movie_watch.watched_at)
+        movie_watch.save()
+
+        messages.success(request, 'Watch details updated successfully!')
+        return redirect('movie_detail', movie_id=movie.movie_id)

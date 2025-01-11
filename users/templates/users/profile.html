@@ -1,55 +1,42 @@
 {% extends 'base.html' %}
 
-{% block title %}User Profile{% endblock %}
+{% block title %}User Watch History{% endblock %}
 
 {% block content %}
     <div class="container mt-5">
-        <h1 class="text-center">Welcome, {{ profile.user.username }}!</h1>
+        <h1 class="text-center">Watch History for {{ profile.user.username }}</h1>
 
-        <!-- Liked Movies Section -->
+        <!-- Watched Movies History Section -->
         <div class="my-4">
-            <h3>Liked Movies</h3>
+            <h3>Watch History (Newest to Oldest)</h3>
             <ul class="list-group">
-                {% for movie in profile.liked_movies.all %}
-                    <li class="list-group-item">{{ movie.movie_name }} ({{ movie.year }})</li>
-                {% empty %}
-                    <li class="list-group-item">No liked movies yet.</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <!-- Disliked Movies Section -->
-        <div class="my-4">
-            <h3>Disliked Movies</h3>
-            <ul class="list-group">
-                {% for movie in profile.disliked_movies.all %}
-                    <li class="list-group-item">{{ movie.movie_name }} ({{ movie.year }})</li>
-                {% empty %}
-                    <li class="list-group-item">No disliked movies yet.</li>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <!-- Watched Movies Section -->
-        <div class="my-4">
-            <h3>Watched Movies</h3>
-            <ul class="list-group">
-                {% for movie_watch in profile.movie_watches.all %}
+                {% for movie_watch in profile.movie_watches.all|dictsortreversed:"watched_at" %}
                     <li class="list-group-item">
-                        {{ movie_watch.movie.movie_name }} ({{ movie_watch.movie.year }}) 
-                        - {% if movie_watch.is_finished %}
-                            <span class="badge bg-success">Finished</span>
-                        {% else %}
-                            <span class="badge bg-warning">Not Finished</span>
-                        {% endif %}
+                        <strong>{{ movie_watch.movie.movie_name }} ({{ movie_watch.movie.year }})</strong>
+                        <br>
+                        <span class="badge 
+                            {% if movie_watch.is_finished %}bg-success{% else %}bg-warning{% endif %}">
+                            {% if movie_watch.is_finished %}Finished{% else %}Not Finished{% endif %}
+                        </span>
+                        <span class="badge 
+                            {% if movie_watch.rating == 1 %}bg-primary
+                            {% elif movie_watch.rating == -1 %}bg-danger
+                            {% else %}bg-secondary{% endif %}">
+                            {% if movie_watch.rating == 1 %}
+                                Liked
+                            {% elif movie_watch.rating == -1 %}
+                                Disliked
+                            {% else %}
+                                Neutral
+                            {% endif %}
+                        </span>
                         <br>
                         <small class="text-muted">Watched on: {{ movie_watch.watched_at|date:"d M Y, H:i" }}</small>
                     </li>
                 {% empty %}
-                    <li class="list-group-item">No movies marked as watched.</li>
+                    <li class="list-group-item">No watch history available.</li>
                 {% endfor %}
             </ul>
         </div>
-
     </div>
 {% endblock %}
