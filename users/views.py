@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .models import UserProfile, MovieWatch
+from .models import UserProfile, Movie, MovieWatch
 from collections import Counter
 
 
@@ -16,7 +16,8 @@ def user_profile(request):
 @login_required
 def common_movie_features(request):
     """
-    Відображає спільні риси фільмів, які отримали рейтинг 'Liked' від поточного користувача.
+    Відображає спільні риси фільмів, які отримали рейтинг 'Liked' від поточного користувача,
+    а також список до 100 найкращих фільмів для кожної з цих рис.
     """
     user_profile = request.user.userprofile  # Отримуємо профіль поточного користувача
     liked_movies = MovieWatch.objects.filter(user_profile=user_profile, rating=1).select_related('movie').prefetch_related('movie__genres', 'movie__directors', 'movie__stars')
@@ -39,7 +40,24 @@ def common_movie_features(request):
         "stars": [star for star, count in stars.items() if count == total_liked],
     }
 
+    # Знаходимо до 100 найкращих фільмів для кожної риси
+    top_movies_by_feature = {
+        "genres": {},
+        "directors": {},
+        "stars": {},
+    }
+
+    for genre in common_features['genres']:
+        top_movies_by_feature['genres'][genre] = Movie.objects.filter(genres__name=genre).order_by('-rating')[:5]
+
+    for director in common_features['directors']:
+        top_movies_by_feature['directors'][director] = Movie.objects.filter(directors__name=director).order_by('-rating')[:5]
+
+    for star in common_features['stars']:
+        top_movies_by_feature['stars'][star] = Movie.objects.filter(stars__name=star).order_by('-rating')[:5]
+
     return render(request, 'users/recommendations.html', {
         'user_profile': user_profile,
         'common_features': common_features,
+        'top_movies_by_feature': top_movies_by_feature,
     })

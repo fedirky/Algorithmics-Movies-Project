@@ -1,46 +1,109 @@
 {% extends 'base.html' %}
 
-{% block title %}Movie Recommendations{% endblock %}
+{% block title %}Top Movies by Common Features{% endblock %}
 
 {% block content %}
     <div class="container my-4">
-        <h1 class="text-center mb-4">🌟 Movie Recommendations</h1>
+        <h1 class="text-center mb-4">🎬 Top Movies by Common Features</h1>
 
-        <div class="list-group">
-            <div class="p-4 border rounded shadow-sm bg-light">
-                <h2 class="text-center mb-3">Common Features in Liked Movies</h2>
+        <!-- Common Features and Movies Section -->
+        <div class="row">
+            <!-- Genres Section -->
+            <div class="col-md-4 mb-4">
+                <div class="p-4 border rounded shadow-sm bg-light">
+                    <h4 class="text-center">Genres</h4>
+                    <ul class="list-group mb-3">
+                        {% for genre in common_features.genres %}
+                            <li class="list-group-item">{{ genre }}</li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No common genres found.</li>
+                        {% endfor %}
+                    </ul>
 
-                <h4>Genres</h4>
-                <ul class="list-group mb-3">
-                    {% for genre in common_features.genres %}
-                        <li class="list-group-item">{{ genre }}</li>
-                    {% empty %}
-                        <li class="list-group-item text-muted">No common genres found.</li>
+                    <h5 class="mt-3">Top Movies by Genre</h5>
+                    {% for genre, movies in top_movies_by_feature.genres.items %}
+                        <div class="mb-3">
+                            <h6 class="fw-bold">{{ genre }}</h6>
+                            <div class="list-group">
+                                {% for movie in movies %}
+                                    <a href="{% url 'movie_detail' movie_id=movie.movie_id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ movie.movie_name }}</h6>
+                                            <small class="text-muted">Year: {{ movie.year }}</small>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">⭐ {{ movie.rating }}</span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
                     {% endfor %}
-                </ul>
-
-                <h4>Directors</h4>
-                <ul class="list-group mb-3">
-                    {% for director in common_features.directors %}
-                        <li class="list-group-item">{{ director }}</li>
-                    {% empty %}
-                        <li class="list-group-item text-muted">No common directors found.</li>
-                    {% endfor %}
-                </ul>
-
-                <h4>Stars</h4>
-                <ul class="list-group mb-3">
-                    {% for star in common_features.stars %}
-                        <li class="list-group-item">{{ star }}</li>
-                    {% empty %}
-                        <li class="list-group-item text-muted">No common stars found.</li>
-                    {% endfor %}
-                </ul>
+                </div>
             </div>
-        </div>
 
-        <div class="alert alert-info mt-4" role="alert">
-            These recommendations are based on the movies you've liked. Keep exploring to find more!
+            <!-- Directors Section -->
+            <div class="col-md-4 mb-4">
+                <div class="p-4 border rounded shadow-sm bg-light">
+                    <h4 class="text-center">Directors</h4>
+                    <ul class="list-group mb-3">
+                        {% for director in common_features.directors %}
+                            <li class="list-group-item">{{ director }}</li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No common directors found.</li>
+                        {% endfor %}
+                    </ul>
+
+                    <h5 class="mt-3">Top Movies by Director</h5>
+                    {% for director, movies in top_movies_by_feature.directors.items %}
+                        <div class="mb-3">
+                            <h6 class="fw-bold">{{ director }}</h6>
+                            <div class="list-group">
+                                {% for movie in movies %}
+                                    <a href="{% url 'movie_detail' movie_id=movie.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ movie.movie_name }}</h6>
+                                            <small class="text-muted">Year: {{ movie.year }}</small>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">⭐ {{ movie.rating }}</span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Stars Section -->
+            <div class="col-md-4 mb-4">
+                <div class="p-4 border rounded shadow-sm bg-light">
+                    <h4 class="text-center">Stars</h4>
+                    <ul class="list-group mb-3">
+                        {% for star in common_features.stars %}
+                            <li class="list-group-item">{{ star }}</li>
+                        {% empty %}
+                            <li class="list-group-item text-muted">No common stars found.</li>
+                        {% endfor %}
+                    </ul>
+
+                    <h5 class="mt-3">Top Movies by Star</h5>
+                    {% for star, movies in top_movies_by_feature.stars.items %}
+                        <div class="mb-3">
+                            <h6 class="fw-bold">{{ star }}</h6>
+                            <div class="list-group">
+                                {% for movie in movies %}
+                                    <a href="{% url 'movie_detail' movie_id=movie.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ movie.movie_name }}</h6>
+                                            <small class="text-muted">Year: {{ movie.year }}</small>
+                                        </div>
+                                        <span class="badge bg-primary rounded-pill">⭐ {{ movie.rating }}</span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
+
