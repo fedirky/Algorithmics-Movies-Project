@@ -31,7 +31,15 @@
                             {% endif %}
                         </span>
                         <br>
-                        <small class="text-muted">Watched on: {{ movie_watch.watched_at|date:"d M Y, H:i" }}</small>
+                        <small class="text-muted">
+                            Watched on: {{ movie_watch.watched_at|date:"d M Y, H:i" }} |
+                            Genres: 
+                            {% for genre in movie_watch.movie.genres.all %}
+                                {{ genre.name }}{% if not forloop.last %}, {% endif %}
+                            {% empty %}
+                                No genres listed
+                            {% endfor %}
+                        </small>
                     </li>
                 {% empty %}
                     <li class="list-group-item">No watch history available.</li>
