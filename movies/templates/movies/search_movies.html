@@ -32,7 +32,17 @@
                     <label for="id_director" class="form-label fw-semibold">Director</label>
                     {{ form.director|add_class:"form-control" }}
                 </div>
-                <div class="col-md-4 d-flex align-items-end">
+                <div class="col-md-4">
+                    <label for="id_sort" class="form-label fw-semibold">Sort by Rating</label>
+                    <select name="sort" id="id_sort" class="form-select">
+                        <option value="desc">Descending</option>
+                        <option value="asc">Ascending</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-4">
+                <div class="col-md-12 d-flex align-items-end">
                     <button type="submit" class="btn btn-primary w-100 py-2">Search</button>
                 </div>
             </div>
@@ -57,3 +67,4 @@
         </div>
     </div>
 {% endblock %}
+

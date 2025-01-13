@@ -46,6 +46,7 @@ class MovieSearchView(ListView):
             genre = form.cleaned_data.get('genre')
             actor = form.cleaned_data.get('actor')
             director = form.cleaned_data.get('director')
+            sort = self.request.GET.get('sort')  # Отримуємо параметр сортування
 
             if name:
                 queryset = queryset.filter(movie_name__icontains=name)
@@ -57,6 +58,13 @@ class MovieSearchView(ListView):
                 queryset = queryset.filter(stars__name__icontains=actor)
             if director:
                 queryset = queryset.filter(directors__name__icontains=director)
+            
+            # Застосовуємо сортування за рейтингом
+            if sort == 'asc':
+                queryset = queryset.order_by('rating')
+            elif sort == 'desc':
+                queryset = queryset.order_by('-rating')
+
         return queryset.distinct()
 
     def get_form(self):
