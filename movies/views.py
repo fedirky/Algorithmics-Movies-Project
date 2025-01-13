@@ -76,7 +76,6 @@ class MovieSearchView(ListView):
         return context
 
 
-
 class MovieWatchUpdateView(View):
     template_name = 'movies/movie_watch_form.html'
 
