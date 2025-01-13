@@ -6,22 +6,36 @@
     <div class="container my-4">
         <h1 class="text-center mb-4">🎥 Search Movies</h1>
 
-        <form method="get" class="mb-4 p-4 border rounded shadow-sm bg-light">
-            <div class="row g-3">
+        {% load custom_filters %}
+        <form method="get" class="mb-5 p-4 border rounded shadow-sm bg-white">
+            <div class="row g-4">
                 <div class="col-md-4">
-                    <label for="id_name" class="form-label fw-bold">Movie Name</label>
-                    {{ form.name }}
+                    <label for="id_name" class="form-label fw-semibold">Movie Name</label>
+                    {{ form.name|add_class:"form-control" }}
                 </div>
                 <div class="col-md-4">
-                    <label for="id_year" class="form-label fw-bold">Release Year</label>
-                    {{ form.year }}
+                    <label for="id_year" class="form-label fw-semibold">Release Year</label>
+                    {{ form.year|add_class:"form-control" }}
                 </div>
                 <div class="col-md-4">
-                    <label for="id_genre" class="form-label fw-bold">Genre</label>
-                    {{ form.genre }}
+                    <label for="id_genre" class="form-label fw-semibold">Genre</label>
+                    {{ form.genre|add_class:"form-control" }}
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary mt-4 w-100">Search</button>
+
+            <div class="row g-4 mt-4">
+                <div class="col-md-4">
+                    <label for="id_actor" class="form-label fw-semibold">Actor</label>
+                    {{ form.actor|add_class:"form-control" }}
+                </div>
+                <div class="col-md-4">
+                    <label for="id_director" class="form-label fw-semibold">Director</label>
+                    {{ form.director|add_class:"form-control" }}
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100 py-2">Search</button>
+                </div>
+            </div>
         </form>
 
         <div class="list-group">

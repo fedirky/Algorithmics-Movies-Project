@@ -44,14 +44,20 @@ class MovieSearchView(ListView):
             name = form.cleaned_data.get('name')
             year = form.cleaned_data.get('year')
             genre = form.cleaned_data.get('genre')
+            actor = form.cleaned_data.get('actor')
+            director = form.cleaned_data.get('director')
 
             if name:
                 queryset = queryset.filter(movie_name__icontains=name)
             if year:
                 queryset = queryset.filter(year=year)
             if genre:
-                queryset = queryset.filter(genres=genre)
-        return queryset
+                queryset = queryset.filter(genres__name__icontains=genre)
+            if actor:
+                queryset = queryset.filter(stars__name__icontains=actor)
+            if director:
+                queryset = queryset.filter(directors__name__icontains=director)
+        return queryset.distinct()
 
     def get_form(self):
         return MovieSearchForm(self.request.GET or None)
@@ -60,6 +66,7 @@ class MovieSearchView(ListView):
         context = super().get_context_data(**kwargs)
         context['form'] = self.get_form()
         return context
+
 
 
 class MovieWatchUpdateView(View):

@@ -1,6 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView
-from .views import user_profile, common_movie_features  
+from .views import user_profile, common_movie_features 
 
 
 urlpatterns = [

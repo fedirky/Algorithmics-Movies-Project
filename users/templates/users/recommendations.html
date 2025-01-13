@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Top Movies by Common Features{% endblock %}
+{% block title %}Movies Recommendations{% endblock %}
 
 {% block content %}
     <div class="container my-4">
-        <h1 class="text-center mb-4">🎬 Top Movies by Common Features</h1>
+        <h1 class="text-center mb-4">🎬 Movies Recommendations</h1>
 
         <!-- Common Features and Movies Section -->
         <div class="row">
@@ -58,7 +58,7 @@
                             <h6 class="fw-bold">{{ director }}</h6>
                             <div class="list-group">
                                 {% for movie in movies %}
-                                    <a href="{% url 'movie_detail' movie_id=movie.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'movie_detail' movie_id=movie.movie_id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                         <div>
                                             <h6 class="mb-1">{{ movie.movie_name }}</h6>
                                             <small class="text-muted">Year: {{ movie.year }}</small>
@@ -90,7 +90,7 @@
                             <h6 class="fw-bold">{{ star }}</h6>
                             <div class="list-group">
                                 {% for movie in movies %}
-                                    <a href="{% url 'movie_detail' movie_id=movie.id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <a href="{% url 'movie_detail' movie_id=movie.movie_id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                         <div>
                                             <h6 class="mb-1">{{ movie.movie_name }}</h6>
                                             <small class="text-muted">Year: {{ movie.year }}</small>
