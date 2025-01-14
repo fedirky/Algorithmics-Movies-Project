@@ -9,7 +9,6 @@
     {% load custom_filters %}
     <form method="get" class="mb-5 p-4 border rounded shadow-sm bg-white">
         <div class="row g-4">
-            <!-- Форма пошуку залишилась незмінною -->
             <div class="col-md-4">
                 <label for="id_name" class="form-label fw-semibold">Movie Name</label>
                 {{ form.name|add_class:"form-control" }}
@@ -24,7 +23,6 @@
             </div>
         </div>
 
-        <!-- Інші поля форми -->
         <div class="row g-4 mt-4">
             <div class="col-md-4">
                 <label for="id_actor" class="form-label fw-semibold">Actor</label>
@@ -35,15 +33,24 @@
                 {{ form.director|add_class:"form-control" }}
             </div>
             <div class="col-md-4">
-                <label for="id_sort" class="form-label fw-semibold">Sort by Rating</label>
+                <label for="id_sort" class="form-label fw-semibold">Sort by</label>
                 <select name="sort" id="id_sort" class="form-select">
-                    <option value="desc">Descending</option>
-                    <option value="asc">Ascending</option>
+                    <option value="rate_desc" {% if request.GET.sort == 'rate_desc' %}selected{% endif %}>Rating: Descending</option>
+                    <option value="rate_asc" {% if request.GET.sort == 'rate_asc' %}selected{% endif %}>Rating: Ascending</option>
+                    <option value="runtime_desc" {% if request.GET.sort == 'runtime_desc' %}selected{% endif %}>Runtime: Descending</option>
+                    <option value="runtime_asc" {% if request.GET.sort == 'runtime_asc' %}selected{% endif %}>Runtime: Ascending</option>
                 </select>
             </div>
         </div>
 
-        <div class="row g-4 mt-4">
+        <div class="row g-4 my-2">
+            <div class="col-md-12">
+                <label class="form-label fw-semibold">Age Rating</label>
+                {{ form.certificates }}
+            </div>
+        </div>
+
+        <div class="row g-4 my-2">
             <div class="col-md-12 d-flex align-items-end">
                 <button type="submit" class="btn btn-primary w-100 py-2">Search</button>
             </div>
@@ -74,4 +81,3 @@
     </div>
 </div>
 {% endblock %}
-

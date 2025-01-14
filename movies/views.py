@@ -51,6 +51,7 @@ class MovieSearchView(ListView):
             genre = form.cleaned_data.get('genre')
             actor = form.cleaned_data.get('actor')
             director = form.cleaned_data.get('director')
+            certificates = form.cleaned_data.get('certificates')
             sort = self.request.GET.get('sort')  # Отримуємо параметр сортування
 
             if name:
@@ -58,17 +59,23 @@ class MovieSearchView(ListView):
             if year:
                 queryset = queryset.filter(year=year)
             if genre:
-                queryset = queryset.filter(genres__name__icontains=genre)
+                queryset = queryset.filter(genres=genre)
             if actor:
-                queryset = queryset.filter(stars__name__icontains=actor)
+                queryset = queryset.filter(stars=actor)
             if director:
-                queryset = queryset.filter(directors__name__icontains=director)
-            
+                queryset = queryset.filter(directors=director)
+            if certificates:
+                queryset = queryset.filter(certificate__in=certificates)
+
             # Застосовуємо сортування за рейтингом
-            if sort == 'asc':
+            if sort == 'rate_asc':
                 queryset = queryset.order_by('rating')
-            elif sort == 'desc':
+            elif sort == 'rate_desc':
                 queryset = queryset.order_by('-rating')
+            elif sort == 'runtime_asc':
+                queryset = queryset.order_by('runtime')
+            elif sort == 'runtime_desc':
+                queryset = queryset.order_by('-runtime')
 
         return queryset.distinct()
 
