@@ -6,39 +6,61 @@
 <div class="container my-4">
     <h1 class="text-center mb-4">🎮 Movies Recommendations</h1>
 
-    <!-- Recommendations Section -->
+    <!-- Highly Recommended Films Section -->
     <div class="row">
         <div class="col-md-12 mb-4">
-            {% if found_movies %}
-                {% for tag_combo, movies in found_movies %}
-                    <div class="p-4 border rounded shadow-sm bg-light mb-4">
-                        <h5 class="fw-bold mt-2">
-                            Tags: 
-                            {% for tag in tag_combo %}
-                                <span class="badge bg-secondary">{{ tag }}</span>
-                            {% endfor %}
-                        </h5>
-                        <div class="list-group mt-2">
-                            {% for movie in movies %}
-                                <a href="{% url 'movie_detail' movie_id=movie.movie_id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <h6 class="mb-1">{{ movie.movie_name }}</h6>
-                                        <small class="text-muted">Year: {{ movie.year }}</small>
-                                        <p class="mb-1"><strong>Genres:</strong> 
-                                            {% for genre in movie.genres.all %}
-                                                <span class="badge bg-secondary">{{ genre.name }}</span>
-                                            {% endfor %}
-                                        </p>
-                                    </div>
-                                    <span class="badge bg-primary rounded-pill">⭐ {{ movie.rating }}</span>
-                                </a>
-                            {% endfor %}
-                        </div>
+            <div class="p-4 border rounded shadow-sm bg-light mb-4">
+                <h2 class="fw-bold my-2">Highly Recommended Films</h2>
+                {% if highly_recommended_movies %}
+                    <div class="list-group mt-2">
+                        {% for movie in highly_recommended_movies %}
+                            <a href="{% url 'movie_detail' movie_id=movie.movie_id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ movie.movie_name }}</h6>
+                                    <small class="text-muted">Year: {{ movie.year }}</small>
+                                    <p class="mb-1"><strong>Genres:</strong> 
+                                        {% for genre in movie.genres.all %}
+                                            <span class="badge bg-secondary">{{ genre.name }}</span>
+                                        {% endfor %}
+                                    </p>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">⭐ {{ movie.rating }}</span>
+                            </a>
+                        {% endfor %}
                     </div>
-                {% endfor %}
-            {% else %}
-                <p class="text-muted text-center">No recommendations found based on your preferences.</p>
-            {% endif %}
+                {% else %}
+                    <p class="text-muted">No highly recommended films found.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Films You Would Like Section -->
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="p-4 border rounded shadow-sm bg-light mb-4">
+                <h2 class="fw-bold my-2">Films You Would Like</h2>
+                {% if films_you_would_like_movies %}
+                    <div class="list-group mt-2">
+                        {% for movie in films_you_would_like_movies %}
+                            <a href="{% url 'movie_detail' movie_id=movie.movie_id %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ movie.movie_name }}</h6>
+                                    <small class="text-muted">Year: {{ movie.year }}</small>
+                                    <p class="mb-1"><strong>Genres:</strong> 
+                                        {% for genre in movie.genres.all %}
+                                            <span class="badge bg-secondary">{{ genre.name }}</span>
+                                        {% endfor %}
+                                    </p>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">⭐ {{ movie.rating }}</span>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No films found that you might like.</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

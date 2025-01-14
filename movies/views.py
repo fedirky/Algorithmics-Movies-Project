@@ -101,7 +101,7 @@ class MovieWatchUpdateView(View):
         })
 
     def post(self, request, movie_id): 
-        movie = get_object_or_404(Movie, id=movie_id)
+        movie = get_object_or_404(Movie, id=movie_id)  # Використання movie_id
         profile = get_object_or_404(UserProfile, user=request.user)
         movie_watch = get_object_or_404(MovieWatch, movie=movie, user_profile=profile)
 
@@ -112,19 +112,20 @@ class MovieWatchUpdateView(View):
         movie_watch.save()
 
         # Отримання нових рекомендацій
-        recommendations = recommended_movies(profile)
-        
+        recommendations_dictionary = recommended_movies(profile)
+
         # Оновлення рекомендацій у профілі користувача
-        profile.priority_movies_recommendations_dictionary = recommendations
+        profile.priority_movies_recommendations_dictionary = json.dumps(recommendations_dictionary)
         profile.save()
 
         messages.success(request, 'Watch details and recommendations updated successfully!')
         return redirect('movie_detail', movie_id=movie.movie_id)
-
+    
 
 def recommended_movies(user_profile):
     """
     Функція для отримання списку фільмів з високою і низькою пріоритетністю на основі спільних тегів.
+    Відкидаються фільми, рейтинг яких менший за 6.
     """
     liked_movies = MovieWatch.objects.filter(
         user_profile=user_profile, rating=1
@@ -148,14 +149,16 @@ def recommended_movies(user_profile):
         [f'director:{director}' for director, count in directors.items() if count >= 2] +
         [f'star:{star}' for star, count in stars.items() if count >= 2]
     )
-
+    watched_movies_ids = set(
+        MovieWatch.objects.filter(user_profile=user_profile).values_list('movie__movie_id', flat=True)
+    )
     high_priority_movies = set()
     low_priority_movies = set()
 
     # Перебираємо всі комбінації від максимальної до мінімальної кількості тегів
     for r in range(len(tags), 0, -1):
         for tag_combo in combinations(tags, r):
-            movies = Movie.objects.all()
+            movies = Movie.objects.filter(rating__gte=6)  # Відкидаємо фільми з рейтингом < 6
             for tag in tag_combo:
                 key, value = tag.split(':')
                 if key == 'genre':
@@ -171,8 +174,9 @@ def recommended_movies(user_profile):
                 high_priority_movies.update(movie.movie_id for movie in movies)
             elif r <= 2:
                 low_priority_movies.update(movie.movie_id for movie in movies)
-    #print("high priority movies", high_priority_movies)
-    return json.dumps({
-        'high_priority_movies': list(high_priority_movies),
-        'low_priority_movies': list(low_priority_movies),
-    })
+
+    return {
+        'high_priority_movies': list(high_priority_movies - watched_movies_ids),
+        'low_priority_movies': list(set(low_priority_movies - high_priority_movies - watched_movies_ids)),
+    }
+

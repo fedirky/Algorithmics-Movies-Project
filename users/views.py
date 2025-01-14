@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from .models import UserProfile, Movie, MovieWatch
 from collections import Counter
 from itertools import combinations
+import json
 
 
 def index_page(request):
@@ -21,58 +22,24 @@ def user_profile(request):
 @login_required
 def common_movie_features(request):
     """
-    Відображає фільми, які мають найбільше спільних рис із переглянутими фільмами користувача.
-    Спочатку шукаються всі комбінації з максимальним числом тегів, потім поступово зменшується кількість тегів.
+    Відображає рекомендовані фільми з профілю користувача.
+    Спочатку відображаються "Highly Recommended Films", потім "Films You Would Like".
     """
     user_profile = request.user.userprofile
-    liked_movies = MovieWatch.objects.filter(
-        user_profile=user_profile, rating=1
-    ).select_related('movie').prefetch_related(
-        'movie__genres', 'movie__directors', 'movie__stars'
-    ).order_by('-watched_at')[:10]
 
-    genres = Counter()
-    directors = Counter()
-    stars = Counter()
+    # Завантаження рекомендацій зі словника профілю
+    recommendations = json.loads(user_profile.priority_movies_recommendations_dictionary or '{}')
 
-    for watch in liked_movies:
-        movie = watch.movie
-        genres.update(genre.name for genre in movie.genres.all())
-        directors.update(director.name for director in movie.directors.all())
-        stars.update(star.name for star in movie.stars.all())
+    # Розділення на категорії
+    highly_recommended = recommendations.get('high_priority_movies', [])
+    films_you_would_like = recommendations.get('low_priority_movies', [])
 
-    # Формуємо список тегів, що з'являються більше двох разів
-    tags = (
-        [f'genre:{genre}' for genre, count in genres.items() if count >= 2] +
-        [f'director:{director}' for director, count in directors.items() if count >= 2] +
-        [f'star:{star}' for star, count in stars.items() if count >= 2]
-    )
-
-    # Debug: Вивід кількості тегів і їх список
-    print(f"Number of tags found: {len(tags)}")
-    print(f"Tags: {tags}")
-
-    found_movies = []
-
-    # Перебираємо всі комбінації від максимальної до мінімальної кількості тегів
-    for r in range(len(tags), 0, -1):
-        for tag_combo in combinations(tags, r):
-            print(f"Processing combination: {tag_combo}")  # Debug
-            movies = Movie.objects.all()
-            for tag in tag_combo:
-                key, value = tag.split(':')
-                if key == 'genre':
-                    movies = movies.filter(genres__name=value)
-                elif key == 'director':
-                    movies = movies.filter(directors__name=value)
-                elif key == 'star':
-                    movies = movies.filter(stars__name=value)
-            movies = movies.distinct().order_by('-rating')[:5]
-            if movies.exists():
-                found_movies.append((tag_combo, movies))
+    # Отримання випадкових 10 фільмів із кожної категорії
+    highly_recommended_movies = Movie.objects.filter(movie_id__in=highly_recommended).order_by('?')[:10]
+    films_you_would_like_movies = Movie.objects.filter(movie_id__in=films_you_would_like).order_by('?')[:10]
 
     return render(request, 'users/recommendations.html', {
         'user_profile': user_profile,
-        'found_movies': found_movies,
-        'tags': tags,
+        'highly_recommended_movies': highly_recommended_movies,
+        'films_you_would_like_movies': films_you_would_like_movies,
     })
