@@ -2,8 +2,10 @@ from django.db import models
 from django.contrib.auth.models import User
 from movies.models import Movie
 
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    priority_movies_recommendations_dictionary = models.TextField(blank=True, null=True)
     
     def __str__(self):
         return self.user.username
@@ -18,4 +20,3 @@ class MovieWatch(models.Model):
 
     def __str__(self):
         return f'{self.movie.movie_name} - Watched: {self.is_finished}, Rating: {self.get_rating_display()}'
-

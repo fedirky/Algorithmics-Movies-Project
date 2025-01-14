@@ -11,6 +11,11 @@ from django.contrib import messages
 from users.models import MovieWatch, UserProfile
 from django.utils.timezone import now
 
+from collections import Counter
+from itertools import combinations
+
+import json
+
 
 class TopRatedMoviesView(ListView):
     model = Movie
@@ -95,7 +100,7 @@ class MovieWatchUpdateView(View):
             'movie_watch': movie_watch,
         })
 
-    def post(self, request, movie_id):
+    def post(self, request, movie_id): 
         movie = get_object_or_404(Movie, id=movie_id)
         profile = get_object_or_404(UserProfile, user=request.user)
         movie_watch = get_object_or_404(MovieWatch, movie=movie, user_profile=profile)
@@ -106,5 +111,68 @@ class MovieWatchUpdateView(View):
         movie_watch.watched_at = request.POST.get('watched_at', movie_watch.watched_at)
         movie_watch.save()
 
-        messages.success(request, 'Watch details updated successfully!')
+        # Отримання нових рекомендацій
+        recommendations = recommended_movies(profile)
+        
+        # Оновлення рекомендацій у профілі користувача
+        profile.priority_movies_recommendations_dictionary = recommendations
+        profile.save()
+
+        messages.success(request, 'Watch details and recommendations updated successfully!')
         return redirect('movie_detail', movie_id=movie.movie_id)
+
+
+def recommended_movies(user_profile):
+    """
+    Функція для отримання списку фільмів з високою і низькою пріоритетністю на основі спільних тегів.
+    """
+    liked_movies = MovieWatch.objects.filter(
+        user_profile=user_profile, rating=1
+    ).select_related('movie').prefetch_related(
+        'movie__genres', 'movie__directors', 'movie__stars'
+    ).order_by('-watched_at')[:10]
+
+    genres = Counter()
+    directors = Counter()
+    stars = Counter()
+
+    for watch in liked_movies:
+        movie = watch.movie
+        genres.update(genre.name for genre in movie.genres.all())
+        directors.update(director.name for director in movie.directors.all())
+        stars.update(star.name for star in movie.stars.all())
+
+    # Формуємо список тегів, що з'являються більше двох разів
+    tags = (
+        [f'genre:{genre}' for genre, count in genres.items() if count >= 2] +
+        [f'director:{director}' for director, count in directors.items() if count >= 2] +
+        [f'star:{star}' for star, count in stars.items() if count >= 2]
+    )
+
+    high_priority_movies = set()
+    low_priority_movies = set()
+
+    # Перебираємо всі комбінації від максимальної до мінімальної кількості тегів
+    for r in range(len(tags), 0, -1):
+        for tag_combo in combinations(tags, r):
+            movies = Movie.objects.all()
+            for tag in tag_combo:
+                key, value = tag.split(':')
+                if key == 'genre':
+                    movies = movies.filter(genres__name=value)
+                elif key == 'director':
+                    movies = movies.filter(directors__name=value)
+                elif key == 'star':
+                    movies = movies.filter(stars__name=value)
+            movies = movies.distinct()
+
+            # Класифікуємо фільми за пріоритетністю
+            if r >= 3:
+                high_priority_movies.update(movie.movie_id for movie in movies)
+            elif r <= 2:
+                low_priority_movies.update(movie.movie_id for movie in movies)
+    #print("high priority movies", high_priority_movies)
+    return json.dumps({
+        'high_priority_movies': list(high_priority_movies),
+        'low_priority_movies': list(low_priority_movies),
+    })

@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from .models import UserProfile, Movie, MovieWatch
 from collections import Counter
+from itertools import combinations
 
 
 def index_page(request):
@@ -16,10 +17,6 @@ def user_profile(request):
     
     return render(request, 'users/profile.html', {'profile': user_profile, 'movie_watches': movie_watches})
 
-
-from itertools import combinations
-from django.db.models import Q
-from collections import Counter
 
 @login_required
 def common_movie_features(request):
@@ -79,4 +76,3 @@ def common_movie_features(request):
         'found_movies': found_movies,
         'tags': tags,
     })
-
