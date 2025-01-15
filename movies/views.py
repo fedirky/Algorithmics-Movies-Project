@@ -127,7 +127,7 @@ class MovieWatchUpdateView(View):
 
         messages.success(request, 'Watch details and recommendations updated successfully!')
         return redirect('movie_detail', movie_id=movie.movie_id)
-    
+
 
 def recommended_movies(user_profile):
     """
@@ -182,8 +182,25 @@ def recommended_movies(user_profile):
             elif r <= 2:
                 low_priority_movies.update(movie.movie_id for movie in movies)
 
+    # Найпопулярніші фільми
+    popular_movies = Movie.objects.filter(
+        movie_id__in=high_priority_movies, votes__gt=5000
+    ).values_list('movie_id', flat=True)
+
+    # Фільми для дітей
+    kids_movies = Movie.objects.filter(
+        movie_id__in=high_priority_movies, certificate__in=['G', 'PG', 'PG-13']
+    ).values_list('movie_id', flat=True)
+
+    # Свіжі поступлення (фільми після 2016 року)
+    recent_movies = Movie.objects.filter(
+        movie_id__in=high_priority_movies, year__gt=2016
+    ).values_list('movie_id', flat=True)
+
     return {
         'high_priority_movies': list(high_priority_movies - watched_movies_ids),
-        'low_priority_movies': list(set(low_priority_movies - high_priority_movies - watched_movies_ids)),
+        'low_priority_movies': list(low_priority_movies - high_priority_movies - watched_movies_ids),
+        'popular_movies': list(set(popular_movies) - watched_movies_ids),
+        'kids_movies': list(set(kids_movies) - watched_movies_ids),
+        'recent_movies': list(set(recent_movies) - watched_movies_ids),
     }
-
