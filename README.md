@@ -2,8 +2,6 @@
 
 A Django 4 web app for discovering movies: search by rich filters, view details, track your watch history, and get personalized recommendations.
 
-> This README was generated from the uploaded codebase (`Algorithmics-Movies-Project-master`). If any detail doesn’t match your intent, tell me and I’ll update it.
-
 ---
 
 ## Table of Contents
